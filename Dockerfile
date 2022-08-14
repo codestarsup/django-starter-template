@@ -7,5 +7,10 @@ COPY . code/
 
 WORKDIR /code/
 
+RUN cp commands/* /usr/bin/
+
 RUN pip install -r requirements/local.txt
 
+WORKDIR /usr/bin/
+
+RUN chmod +x $(ls /code/commands)
