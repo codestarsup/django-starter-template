@@ -1,0 +1,3 @@
+
+# Django starter template 
+
