@@ -1,4 +1,4 @@
-from .handler import env
+from .handler import BASE_DIR, env
 
 DJANGO_APPS = [
     "django.contrib.admin",
@@ -10,7 +10,7 @@ DJANGO_APPS = [
 ]
 
 LOCAL_APPS = [
-    'apps.core',
+    "apps.core",
 ]
 
 # CHECK IF INSTALLED APPS INCLUDE THE PACKAGE FIRST
@@ -18,3 +18,5 @@ THIRD_PARTY_APPS = []
 
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
+APPS_DIR = BASE_DIR / "apps"
