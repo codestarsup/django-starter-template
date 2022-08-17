@@ -24,17 +24,37 @@ class BaseTemplate:
     def validate(self, dirs: list):
         ...
 
+    def make_parent_dirs(self, dir: str):
+        dir = dir.split("/")
+        for i, j in enumerate(dir):
+            try:
+                os.mkdir("/".join(dir[: i + 1]) + "/")
+            except FileExistsError:
+                continue
+
     def make_template(self):
-        os.mkdir(self.parent_dir / self.ROOT)
+
+        self.validate(self.dirs)
+
+        try:
+            os.mkdir(self.parent_dir / self.ROOT)
+        except FileNotFoundError:
+            raise FileNotFoundError(f"No such app in directory '{self.parent_dir}'")
+        except FileExistsError:
+            raise FileExistsError(
+                f"The api in already setup in directory: '{self.parent_dir}'"
+            )
+        except Exception as e:
+            raise e
 
         for dir in self.dirs:
+            dir = str(dir)
+            if "/" in dir:
+                last_slash = dir.rfind("/")
+                self.make_parent_dirs(dir[:last_slash])
             os.mknod(dir)
 
 
 class ApiTemplate(BaseTemplate):
-    FILES = [
-        "views.py",
-        "serializers.py",
-        "urls.py",
-    ]
+    FILES = ["views.py", "serializers.py", "urls.py"]
     ROOT = "api"
