@@ -14,3 +14,5 @@ RUN pip install -r requirements/local.txt
 WORKDIR /usr/bin/
 
 RUN chmod +x $(ls /code/commands)
+
+WORKDIR /code/

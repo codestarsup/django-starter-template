@@ -1,8 +1,8 @@
 # CUSTOM
 data/
 .vscode/
-migrations/*
-!migrations/__init__.py
+apps/*/migrations/*
+!apps/*/migrations/__init__.py
 
 
 # Created by https://www.toptal.com/developers/gitignore/api/django

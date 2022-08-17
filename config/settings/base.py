@@ -3,7 +3,7 @@ from .handler import env, BASE_DIR
 SECRET_KEY = "django-insecure-^hx4vco_&p3urjr5p9y1evw7^p%caba0+3p64q=a$!2l&=z=oz"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env.bool("DEBUG")
+DEBUG = env.bool("DEBUG", False)
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
 
