@@ -27,7 +27,7 @@ class Command(BaseCommand):
 
         if not app_name:
             raise CommandError(
-                "You must either define appname or both appname and appdir"
+                "You must either provide appname or both appname and appdir"
             )
 
         if is_default:
