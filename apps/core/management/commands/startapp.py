@@ -20,3 +20,6 @@ class Command(TemplateCommand):
             target = settings.APPS_DIR / app_name
 
         super().handle("app", app_name, target, **options)
+        self.stdout.write(
+            self.style.SUCCESS(f"App {app_name} created in directory: {target}")
+        )
