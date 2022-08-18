@@ -19,3 +19,5 @@ services:
       - ./data/db:/var/lib/postgresql/data
     env_file:
       - .envs/local/.postgres
+    ports:
+      - "5432:5432"
