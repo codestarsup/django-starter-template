@@ -6,7 +6,9 @@ This repository is a boilerplate Django project for quickly getting started. Cre
 ## Table Of Contents
 - [Getting Started](#getting-started)
 - [Custom Commands](#custom-commands)
-    -[startapp](#startapp)
+
+    - [startapp](#startapp)
+    - [startapi](#startapi)
 
 ## Getting Started
 
@@ -54,14 +56,17 @@ or ignore `APPS_DIR` and give the directory yourself, which is not recommended a
 $ docker compose run web python manage.py startapp core --appdir /home/django/core/apps/app
 ```
 
-### rmapp
-
+### startapi
 **usage**:
-Remove existing django application.
+Create files and directories needed to develop restful apis in the app directory.
 
 **example**:
 ```bash
-$ docker compose run web python manage.py rmapp core
+$ docker compose run web python manage.py startapi core #To create files needed for rest api development in the core app directory
+```
+or you can create the files within every other directory your app lives in:
+```bash
+$ docker compose run web python manage.py startapi core --appdir /code/foo/
 ```
 
 ### renameproject
