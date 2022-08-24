@@ -6,6 +6,11 @@ class BaseTemplate:
     FILES = []
     ROOT = ""
 
+    class WriteMode:
+        APPEND = "a"
+        REWRITE = "w"
+        REPLACE = "r"
+
     def __init__(self, parent_dir="", root="", ignore_parent=False):
         self.ignore_parent = ignore_parent
         self.parent_dir = parent_dir
@@ -19,7 +24,7 @@ class BaseTemplate:
                 "You must either provide a parent dir or set ignore_parent to True"
             )
 
-        return [self.parent_dir / self.ROOT / x for x in self.FILES]
+        return [(self.parent_dir / self.ROOT, x) for x in self.FILES]
 
     def validate(self, dirs: list):
         ...
@@ -48,13 +53,58 @@ class BaseTemplate:
             raise e
 
         for dir in self.dirs:
-            dir = str(dir)
-            if "/" in dir:
-                last_slash = dir.rfind("/")
-                self.make_parent_dirs(dir[:last_slash])
-            os.mknod(dir)
+            dir = tuple(map(lambda x: str(x), dir))
+            self.make_parent_dirs(dir[0])
+            os.mknod(dir[1])
+            self.write_data()
+
+    def write_data(self):
+        for i in self.FILES:
+            attr_name = f"{i.replace('/', '_').replace('.py', '')}_write"
+            if hasattr(self, attr_name):
+                attr = getattr(self, attr_name)
+                write_data = attr()
+                try:
+                    write_mode = write_data["mode"]
+                    data = write_data["data"]
+                except KeyError:
+                    raise Exception(
+                        f'Write function must return a dictionary containing "data" and "mode" keys.'
+                    )
+
+                # VALIDATE IF FUNCTION IS RETURNING WHAT WE NEED
+                self.validate_write(write_data)
+
+                if write_mode == BaseTemplate.WriteMode.APPEND:
+                    with open(f"{i}", "a") as f:
+                        f.write(data)
+
+                elif write_mode == BaseTemplate.WriteMode.REWRITE:
+                    with open(f"{i}", "w") as f:
+                        f.write(data)
+
+                elif write_mode == BaseTemplate.WriteMode.REPLACE:
+                    with open(f"{i}", "r+") as f:
+                        file_data = f.read()
+                        try:
+                            replace_data = write_data["replace"]
+                        except:
+                            raise Exception(
+                                "In replace mode write function returning dictionary"
+                                "must contain a key named 'replace' which is a tuple (old, new)"
+                            )
+
+                        for i in replace_data:
+                            file_data = file_data.replace(*i)
+
+                        f.truncate()
+                        f.seek(0)
+                        f.write(file_data)
 
 
-class ApiTemplate(BaseTemplate):
+class ApiFilesTemplate(BaseTemplate):
     FILES = ["views.py", "serializers.py", "urls.py"]
     ROOT = "api"
+
+    def views_write(self):
+        context = {"mode": self.WriteMode.REWRITE, "s": ""}
