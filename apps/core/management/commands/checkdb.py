@@ -8,7 +8,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "appname",
+            "--appname",
             type=str,
             help="The current Django project folder name",
             default=None,
@@ -37,12 +37,27 @@ class Command(BaseCommand):
 
             if warnings:
                 self.stdout.write("\n".join(warnings))
+            else:
+                self.stdout.write(self.style.SUCCESS("No problems found."))
 
         else:
-            for app in LOCAL_APPS:
+            warnings = []
+            for app_name in LOCAL_APPS:
                 try:
+                    app_name = app_name.split(".")[-1]
                     app = apps.get_app_config(app_name)
                 except LookupError:
                     raise CommandError(
                         f"LookupError: No installed app with label '{app_name}'"
                     )
+                models = app.get_models()
+                warnings += [
+                    self.format_warning(model, type="str")
+                    for model in models
+                    if not "__str__" in model.__dict__
+                ]
+
+            if warnings:
+                self.stdout.write("\n".join(warnings))
+            else:
+                self.stdout.write(self.style.SUCCESS("No problems found."))
