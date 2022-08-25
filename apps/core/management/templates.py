@@ -1,15 +1,11 @@
 from functools import cached_property
+from django.conf import settings
 import os
 
 
 class BaseTemplate:
     FILES = []
     ROOT = ""
-
-    class WriteMode:
-        APPEND = "a"
-        REWRITE = "w"
-        REPLACE = "r"
 
     def __init__(self, parent_dir="", root="", ignore_parent=False):
         self.ignore_parent = ignore_parent
@@ -24,9 +20,52 @@ class BaseTemplate:
                 "You must either provide a parent dir or set ignore_parent to True"
             )
 
-        return [(self.parent_dir / self.ROOT, x) for x in self.FILES]
+        return [
+            (
+                self.parent_dir / self.ROOT / "/".join(x.split("/")[:-1]),
+                x.split("/")[-1],
+            )
+            for x in self.FILES
+        ]
 
-    def validate(self, dirs: list):
+    @cached_property
+    def write_only_dirs(self):
+        if not self.parent_dir and self.ignore_parent == False:
+            raise TypeError(
+                "You must either provide a parent dir or set ignore_parent to True"
+            )
+
+        return [
+            (
+                self.BASE_DIR / "/".join(x.split("/")[:-1]),
+                x.split("/")[-1],
+            )
+            for x in self.FILES
+        ]
+
+    def make_template(self):
+        try:
+            os.mkdir(self.parent_dir / self.ROOT)
+        except FileNotFoundError:
+            raise FileNotFoundError(f"No such app in directory '{self.parent_dir}'")
+        except FileExistsError:
+            raise FileExistsError(
+                f"The api in already setup in directory: '{self.parent_dir}'"
+            )
+
+        for dir in self.dirs:
+            dir = tuple(map(lambda x: str(x), dir))
+            print(dir)
+            self.make_parent_dirs(dir[0])
+            try:
+                print("/".join(dir))
+                os.mknod("/".join(dir))
+            except FileExistsError:
+                pass
+        self.write_data()
+        self.extra_write()
+
+    def extra_write(self):
         ...
 
     def make_parent_dirs(self, dir: str):
@@ -37,74 +76,57 @@ class BaseTemplate:
             except FileExistsError:
                 continue
 
-    def make_template(self):
-
-        self.validate(self.dirs)
-
-        try:
-            os.mkdir(self.parent_dir / self.ROOT)
-        except FileNotFoundError:
-            raise FileNotFoundError(f"No such app in directory '{self.parent_dir}'")
-        except FileExistsError:
-            raise FileExistsError(
-                f"The api in already setup in directory: '{self.parent_dir}'"
-            )
-        except Exception as e:
-            raise e
-
-        for dir in self.dirs:
-            dir = tuple(map(lambda x: str(x), dir))
-            self.make_parent_dirs(dir[0])
-            os.mknod(dir[1])
-            self.write_data()
-
     def write_data(self):
-        for i in self.FILES:
-            attr_name = f"{i.replace('/', '_').replace('.py', '')}_write"
+        for i in self.dirs:
+            attr_name = f"{i[1].replace('/', '_').replace('.py', '')}_write"
             if hasattr(self, attr_name):
                 attr = getattr(self, attr_name)
-                write_data = attr()
-                try:
-                    write_mode = write_data["mode"]
-                    data = write_data["data"]
-                except KeyError:
-                    raise Exception(
-                        f'Write function must return a dictionary containing "data" and "mode" keys.'
-                    )
+                self.perform_write(attr, i[0] / i[1])
 
-                # VALIDATE IF FUNCTION IS RETURNING WHAT WE NEED
-                self.validate_write(write_data)
+    def perform_write(self, func, dir):
+        func(dir)
 
-                if write_mode == BaseTemplate.WriteMode.APPEND:
-                    with open(f"{i}", "a") as f:
-                        f.write(data)
+    def append_file(self, file: str, data: str, overwrite=False):
+        with open(f"{file}", "r+") as f:
+            if overwrite:
+                file_data = f.read()
+                if not data in file_data:
+                    f.write(f"\n{data}")
+            else:
+                f.write(data)
 
-                elif write_mode == BaseTemplate.WriteMode.REWRITE:
-                    with open(f"{i}", "w") as f:
-                        f.write(data)
+    def write_file(self, file: str, data: str):
+        with open(f"{file}", "w") as f:
+            f.write(data)
 
-                elif write_mode == BaseTemplate.WriteMode.REPLACE:
-                    with open(f"{i}", "r+") as f:
-                        file_data = f.read()
-                        try:
-                            replace_data = write_data["replace"]
-                        except:
-                            raise Exception(
-                                "In replace mode write function returning dictionary"
-                                "must contain a key named 'replace' which is a tuple (old, new)"
-                            )
+    def replace_file(self, file: str, data: list):
+        with open(f"{file}", "r+") as f:
+            file_data = f.read()
+            replace_data = data
 
-                        for i in replace_data:
-                            file_data = file_data.replace(*i)
+            if not isinstance(data, list):
+                raise TypeError(
+                    "data must be instance of list containing tuples which represent new and old values"
+                )
 
-                        f.truncate()
-                        f.seek(0)
-                        f.write(file_data)
+            for i in replace_data:
+                file_data = file_data.replace(*i)
+
+            f.truncate()
+            f.seek(0)
+            f.write(file_data)
 
 
-class ApiFilesTemplate(BaseTemplate):
+class ApiTemplate(BaseTemplate):
     FILES = ["views.py", "serializers.py", "urls.py"]
     ROOT = "api"
 
-    def views_write(self):
-        context = {"mode": self.WriteMode.REWRITE, "s": ""}
+    def views_write(self, file):
+        self.write_file(file, "from rest_framework.viewsets import ModelViewSet")
+
+    def extra_write(self):
+        self.append_file(
+            os.path.join(settings.BASE_DIR, "requirements/base.txt"),
+            "djangorestframework==3.13.1",
+            True,
+        )
