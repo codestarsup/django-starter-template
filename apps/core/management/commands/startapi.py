@@ -1,10 +1,7 @@
-from ast import parse
-import os
-
 from django.core.management.base import CommandError, BaseCommand
 from django.conf import settings
 
-from ..templates import ApiTemplate
+from apps.core.management.templates import ApiTemplate
 
 
 class Command(BaseCommand):
