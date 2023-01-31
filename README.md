@@ -1,7 +1,7 @@
 # Django Project Boilerplate
 This repository is a boilerplate Django project for quickly getting started. Created by **Code Stars Up** team
 
-</br>
+<br>
 
 ## Table Of Contents
 - [Getting Started](#getting-started)
@@ -12,45 +12,57 @@ This repository is a boilerplate Django project for quickly getting started. Cre
 
 ## Getting Started
 
-1. First you must clone the boilerplate, to do it so use the command below in terminal:
+1. Before anything, please run below command to add pre-commit hook, for code quality assurance:
+    ```bash
+    # If `make` is installed
+    $ make githook
+
+    # or
+
+    # If `make` is an unrecognized command
+    $ git config --local core.hooksPath ./.githooks/
+    ```
+   Make sure you will have your pipeline on GitLab, referencing `.gitlab-ci.yml` file.<br><br>
+
+2. First you must clone the boilerplate, to do it so use the command below in terminal:
     ```bash
     $ git clone git@github.com:codestarsup/django-starter-template.git
     ```
 
-2. Build the dockerfile (Note: If you dont have docker and docker-compose already installed flow the instructions of [Docker official docs](https://docs.docker.com/compose/install/) to install them):
+3. Build the dockerfile (Note: If you don't have docker and docker-compose already installed flow the instructions of [Docker official docs](https://docs.docker.com/compose/install/) to install them):
 
     ```bash
     $ docker-compose build
     ```
-3. Your image is ready and you can run your project by typing `$ docker-compose up` in the terminal
+4. Your image is ready, and you can run your project by typing `$ docker-compose up` in the terminal
 
-5. To intract with docker and run you bash scripts like `python manage.py makemigrations` you can write the command like bellow
+5. To interact with docker and run you bash scripts like `python manage.py makemigrations` you can write the command like bellow
     ```bash
     $ docker-compose run web python manage.py <your_command>
     ```
     Or open a terminal session inside container and run with your django project commands simply
     ```bash
     $ docker-compose run web bash
-    
+
     >> django@ :/code$ python manage.py makemigrations
     ```
 
 ## Custom Commands
 
-In this boilerplate we have written some usefull commands to make it easier to work with django in this environment.
+In this boilerplate we have written some usefully commands to make it easier to work with django in this environment.
 
 ### startapp
 
 **usage**:
 Create django apps within the boilerplate structure.
 
-**config**: 
-You can change the variable `APPS_DIR` in `config/settings/apps.py` which points to abolute path of the django apps directory to change the default one.
+**config**:
+You can change the variable `APPS_DIR` in `config/settings/apps.py` which points to absolute path of the django apps directory to change the default one.
 
 **example**:
 ```bash
 $ docker-compose run web python manage.py startapp core
-``` 
+```
 or ignore `APPS_DIR` and give the directory yourself, which is not recommended at all:
 ```bash
 $ docker-compose run web python manage.py startapp core --appdir /home/django/core/apps/app
@@ -77,4 +89,4 @@ Rename the project in all necessary files.
 **example**:
 ```bash
 $ docker-compose run web python manage.py renameproject config codestars # "config" is the current name of project and "codestars" is the new name
-``` 
+```
