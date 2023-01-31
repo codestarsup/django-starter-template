@@ -5,6 +5,9 @@ ARG1 := $(word 2, $(MAKECMDGOALS) )
 ARG2 := $(word 3, $(MAKECMDGOALS) )
 ARG3 := $(word 4, $(MAKECMDGOALS) )
 
+githook:
+	@ git config --local core.hooksPath .githooks/
+
 update:
 	@ $(PIP_BIN) install -r requirements/local.txt
 
@@ -25,7 +28,39 @@ startapi:
 checkdb:
 	@ [ -z "$ARG1" ] && $(MANAGE_PY) checkdb $(ARG1) || $(MANAGE_PY) checkdb
 
+run-dev:
+	python manage.py runserver 0.0.0.0:8000
 
+run:
+	python manage.py runserver 0.0.0.0:8000
+
+pip:
+	pip install -r ./requirements/production.txt
+
+pip-dev:
+	pip install -r ./requirements/local.txt
+
+test:
+	python manage.py test
+
+up:
+	docker-compose -f ./docker-compose.yml up -d --build
+
+down:
+	docker-compose -f ./docker-compose.yml down
+
+format:
+	black **/*.py
+
+format-check:
+	black **/*.py --check
+
+lint:
+	pylint --recursive=y .
+
+qa-check:
+	pylint --recursive=y `git diff --name-only --diff-filter=d | grep -E '\.py$' | tr '\n' ' '`
+	black **/*.py --check --exclude '\.venv/|\.git/'
 
 %:
 	@:
