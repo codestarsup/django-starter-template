@@ -1,0 +1,7 @@
+[MAIN]
+ignore=migrations,.venv,.git
+disable=
+    C0114, # missing-module-docstring
+
+[FORMAT]
+max-line-length=120
