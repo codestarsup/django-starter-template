@@ -20,9 +20,12 @@ jobs:
       - name: Install dependencies
         run: |
           make pip-dev
-      - name: Run linter and formatter
+      - name: Run linter
         run: |
-          make qa-check
+          make lint-changed-files
+      - name: Run formatter
+        run: |
+          make format-check
       - name: Run tests
         run: |
           make test

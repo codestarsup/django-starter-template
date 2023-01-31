@@ -11,7 +11,7 @@ qa_test_stage:
 
   script:
     # Run linter
-    - make lint
+    - make lint-changed-files
     # Run `black` with `--check` flag
     - make format-check
     # Run tests
