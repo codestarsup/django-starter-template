@@ -1,3 +1,4 @@
+CHANGED_FILES = git diff --name-only --diff-filter=d | grep -E "\.py$" | tr "\n" " "
 LOCAL_COMPOSE = docker compose run web
 PIP_BIN =  $(LOCAL_COMPOSE) python -m pip
 MANAGE_PY =  $(LOCAL_COMPOSE) python manage.py
@@ -50,16 +51,19 @@ down:
 	docker-compose -f ./docker-compose.yml down
 
 format:
-	black **/*.py
+	black **/*.py --exclude '\.venv/|\.git/'
 
 format-check:
-	black **/*.py --check
+	black **/*.py --check --exclude '\.venv/|\.git/'
 
 lint:
 	pylint --recursive=y .
 
+lint-changed-files:
+	FILES=$("$CHANGED_FILES") && [[ ! -z "$(FILES)" ]] && pylint --recursive=y "$(FILES)" || echo ""
+
 qa-check:
-	pylint --recursive=y `git diff --name-only --diff-filter=d | grep -E '\.py$' | tr '\n' ' '`
+	FILES=$("$CHANGED_FILES") && [[ ! -z "$(FILES)" ]] && pylint --recursive=y "$(FILES)" || echo ""
 	black **/*.py --check --exclude '\.venv/|\.git/'
 
 %:
