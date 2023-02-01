@@ -1,14 +1,13 @@
 from .handler import env
 
-SECRET_KEY = "django-insecure-^hx4vco_&p3urjr5p9y1evw7^p%caba0+3p64q=a$!2l&=z=oz"
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env.bool("DEBUG", False)
+SECRET_KEY = env.str(
+    "SECRET_KEY",
+    default="django-insecure-^hx4vco_&p3urjr5p9y1evw7^p%caba0+3p64q=a$!2l&=z=oz",
+)
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
+CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS")
 
-
-# Application definition
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -39,10 +38,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-
-# Password validation
-# https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -58,13 +53,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/4.1/topics/i18n/
-
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = env.str("TIMEZONE", default="UTC")
 
 USE_I18N = True
 
