@@ -29,9 +29,9 @@ class Command(BaseCommand):
             )
 
         if not app_dir:
-            parent_dir = settings.APPS_DIR / app_name
+            parent_directory = settings.APPS_DIR / app_name
         else:
-            parent_dir = app_dir
+            parent_directory = app_dir
 
-        ApiTemplate(parent_dir=parent_dir).make_template()
+        ApiTemplate(parent_directory=parent_directory).make_template()
         self.stdout.write(f"Api created successfully for app '{app_name}'")

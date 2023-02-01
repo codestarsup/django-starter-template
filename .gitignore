@@ -3,6 +3,7 @@ data/
 .vscode/
 apps/*/migrations/*
 !apps/*/migrations/__init__.py
+.idea/
 
 
 # Created by https://www.toptal.com/developers/gitignore/api/django

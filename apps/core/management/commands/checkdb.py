@@ -1,6 +1,7 @@
-from django.core.management.base import CommandError, BaseCommand
-from config.settings.apps import LOCAL_APPS
 from django.apps import apps
+from django.core.management.base import CommandError, BaseCommand
+
+from config.settings.apps import LOCAL_APPS
 
 
 class Command(BaseCommand):
@@ -14,9 +15,9 @@ class Command(BaseCommand):
             default=None,
         )
 
-    def format_warning(self, msg: str, type: str = None):
-        if type == "str":
-            return self.style.WARNING(f"Warning: Model {msg} has not __str__ method.")
+    def format_warning(self, message: str, warning_type: str = None):
+        if warning_type == "str":
+            return self.style.WARNING(f"Warning: Model {message} has not __str__ method.")
 
     def handle(self, *args, **options):
         app_name = options.get("appname")
@@ -24,15 +25,15 @@ class Command(BaseCommand):
         if app_name:
             try:
                 app = apps.get_app_config(app_name)
-            except LookupError:
+            except LookupError as exc:
                 raise CommandError(
                     f"LookupError: No installed app with label '{app_name}'"
-                )
+                ) from exc
             models = app.get_models()
             warnings = [
-                self.format_warning(model, type="str")
+                self.format_warning(model, warning_type="str")
                 for model in models
-                if not "__str__" in model.__dict__
+                if "__str__" not in model.__dict__
             ]
 
             if warnings:
@@ -44,17 +45,17 @@ class Command(BaseCommand):
             warnings = []
             for app_name in LOCAL_APPS:
                 try:
-                    app_name = app_name.split(".")[-1]
+                    app_name = app_name.rsplit('.', maxsplit=1)[-1]
                     app = apps.get_app_config(app_name)
-                except LookupError:
+                except LookupError as exc:
                     raise CommandError(
                         f"LookupError: No installed app with label '{app_name}'"
-                    )
+                    ) from exc
                 models = app.get_models()
                 warnings += [
-                    self.format_warning(model, type="str")
+                    self.format_warning(model, warning_type="str")
                     for model in models
-                    if not "__str__" in model.__dict__
+                    if "__str__" not in model.__dict__
                 ]
 
             if warnings:
