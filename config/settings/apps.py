@@ -1,4 +1,4 @@
-from .handler import BASE_DIR, env
+from .handler import BASE_DIR
 
 DJANGO_APPS = [
     "django.contrib.admin",

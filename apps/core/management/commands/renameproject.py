@@ -29,16 +29,16 @@ class Command(BaseCommand):
             "manage.py",
         ]
 
-        for f in files_to_rename:
-            with open(f, "r+") as file:
-                filedata = file.read()
-                filedata = filedata.replace(current_project_name, new_project_name)
+        for file_to_rename in files_to_rename:
+            with open(file_to_rename, "r+", encoding="utf-8") as file:
+                file_data = file.read()
+                file_data = file_data.replace(current_project_name, new_project_name)
                 file.seek(0)
                 file.truncate()
-                file.write(filedata)
+                file.write(file_data)
 
         os.rename(current_project_name, new_project_name)
 
         self.stdout.write(
-            self.style.SUCCESS("Project has been renamed to %s" % new_project_name)
+            self.style.SUCCESS(f"Project has been renamed to {new_project_name}")
         )

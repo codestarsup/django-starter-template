@@ -1,65 +1,72 @@
-from functools import cached_property
-from django.conf import settings
 import os
+from functools import cached_property
+from pathlib import Path
+
+from django.conf import settings
 
 
 class BaseTemplate:
-    FILES = []
-    ROOT = ""
+    files = []
 
-    def __init__(self, parent_dir="", root="", ignore_parent=False):
+    def __init__(
+        self,
+        parent_directory: Path | None = None,
+        root: Path | None = None,
+        ignore_parent=False,
+    ):
         self.ignore_parent = ignore_parent
-        self.parent_dir = parent_dir
-        if root:
-            self.ROOT = root
+        self.parent_directory = parent_directory or ""
+        self.root = root or ""
 
     @cached_property
-    def dirs(self):
-        if not self.parent_dir and self.ignore_parent == False:
+    def directories(self):
+        if not self.parent_directory and self.ignore_parent is False:
             raise TypeError(
-                "You must either provide a parent dir or set ignore_parent to True"
+                "You must either provide a `parent_directory` or set `ignore_parent` to True"
             )
 
         return [
             (
-                self.parent_dir / self.ROOT / "/".join(x.split("/")[:-1]),
-                x.split("/")[-1],
+                self.parent_directory / self.root / "/".join(file.split("/")[:-1]),
+                file.split("/")[-1],
             )
-            for x in self.FILES
+            for file in self.files
         ]
 
     @cached_property
-    def write_only_dirs(self):
-        if not self.parent_dir and self.ignore_parent == False:
+    def write_only_directories(self):
+        if not self.parent_directory and self.ignore_parent is False:
             raise TypeError(
-                "You must either provide a parent dir or set ignore_parent to True"
+                "You must either provide a `parent_directory` or set `ignore_parent` to True"
             )
 
         return [
             (
-                self.BASE_DIR / "/".join(x.split("/")[:-1]),
-                x.split("/")[-1],
+                settings.BASE_DIR / "/".join(file.split("/")[:-1]),
+                file.split("/")[-1],
             )
-            for x in self.FILES
+            for file in self.files
         ]
 
     def make_template(self):
         try:
-            os.mkdir(self.parent_dir / self.ROOT)
-        except FileNotFoundError:
-            raise FileNotFoundError(f"No such app in directory '{self.parent_dir}'")
-        except FileExistsError:
+            os.mkdir(self.parent_directory / self.root)
+        except FileNotFoundError as exc:
+            raise FileNotFoundError(
+                f"No such app in directory '{self.parent_directory}'"
+            ) from exc
+        except FileExistsError as exc:
             raise FileExistsError(
-                f"The api in already setup in directory: '{self.parent_dir}'"
-            )
+                f"The api in already setup in directory: '{self.parent_directory}'"
+            ) from exc
 
-        for dir in self.dirs:
-            dir = tuple(map(lambda x: str(x), dir))
-            print(dir)
-            self.make_parent_dirs(dir[0])
+        for directory in self.directories:
+            directory = tuple(map(str, directory))
+            print(directory)
+            self.make_parent_directories(directory[0])
             try:
-                print("/".join(dir))
-                os.mknod("/".join(dir))
+                print("/".join(directory))
+                os.mknod("/".join(directory))
             except FileExistsError:
                 pass
         self.write_data()
@@ -68,40 +75,40 @@ class BaseTemplate:
     def extra_write(self):
         ...
 
-    def make_parent_dirs(self, dir: str):
-        dir = dir.split("/")
-        for i, j in enumerate(dir):
+    def make_parent_directories(self, directory: str):
+        directory = directory.split("/")
+        for idx, _ in enumerate(directory):
             try:
-                os.mkdir("/".join(dir[: i + 1]) + "/")
+                os.mkdir("/".join(directory[: idx + 1]) + "/")
             except FileExistsError:
                 continue
 
     def write_data(self):
-        for i in self.dirs:
-            attr_name = f"{i[1].replace('/', '_').replace('.py', '')}_write"
+        for directory in self.directories:
+            attr_name = f"{directory[1].replace('/', '_').replace('.py', '')}_write"
             if hasattr(self, attr_name):
                 attr = getattr(self, attr_name)
-                self.perform_write(attr, i[0] / i[1])
+                self.perform_write(attr, directory[0] / directory[1])
 
-    def perform_write(self, func, dir):
-        func(dir)
+    def perform_write(self, function, directory):
+        function(directory)
 
-    def append_file(self, file: str, data: str, overwrite=False):
-        with open(f"{file}", "r+") as f:
+    def append_file(self, file_path: str, data: str, overwrite=False):
+        with open(f"{file_path}", "r+", encoding="utf-8") as file:
             if overwrite:
-                file_data = f.read()
-                if not data in file_data:
-                    f.write(f"\n{data}")
+                file_data = file.read()
+                if data not in file_data:
+                    file.write(f"\n{data}")
             else:
-                f.write(data)
+                file.write(data)
 
-    def write_file(self, file: str, data: str):
-        with open(f"{file}", "w") as f:
-            f.write(data)
+    def write_file(self, file_path: str, data: str):
+        with open(f"{file_path}", "w", encoding="utf-8") as file:
+            file.write(data)
 
-    def replace_file(self, file: str, data: list):
-        with open(f"{file}", "r+") as f:
-            file_data = f.read()
+    def replace_file(self, file_path: str, data: list):
+        with open(f"{file_path}", "r+", encoding="utf-8") as file:
+            file_data = file.read()
             replace_data = data
 
             if not isinstance(data, list):
@@ -112,13 +119,13 @@ class BaseTemplate:
             for i in replace_data:
                 file_data = file_data.replace(*i)
 
-            f.truncate()
-            f.seek(0)
-            f.write(file_data)
+            file.truncate()
+            file.seek(0)
+            file.write(file_data)
 
 
 class ApiTemplate(BaseTemplate):
-    FILES = ["views.py", "serializers.py", "urls.py"]
+    files = ["views.py", "serializers.py", "urls.py"]
     ROOT = "api"
 
     def views_write(self, file):
