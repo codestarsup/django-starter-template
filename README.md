@@ -29,20 +29,22 @@ This repository is a boilerplate Django project for quickly getting started. Cre
     $ git clone git@github.com:codestarsup/django-starter-template.git
     ```
 
-3. Build the dockerfile (Note: If you don't have docker and docker-compose already installed flow the instructions of [Docker official docs](https://docs.docker.com/compose/install/) to install them):
+3. Build the dockerfile (Note: If you don't have docker and docker compose -f docker-compose.local.yml already installed flow the instructions of [Docker official docs](https://docs.docker.com/compose/install/) to install them):
 
     ```bash
-    $ docker-compose build
+    $ docker compose -f docker-compose.local.yml build
     ```
-4. Your image is ready, and you can run your project by typing `$ docker-compose up` in the terminal
+4. Your image is ready, and you can run your project by typing `$ docker compose -f docker-compose.local.yml up -d` in the terminal
+
+<br>
 
 5. To interact with docker and run you bash scripts like `python manage.py makemigrations` you can write the command like bellow
     ```bash
-    $ docker-compose run web python manage.py <your_command>
+    $ docker compose -f docker-compose.local.yml run web python manage.py <your_command>
     ```
     Or open a terminal session inside container and run with your django project commands simply
     ```bash
-    $ docker-compose run web bash
+    $ docker compose -f docker-compose.local.yml run web bash
 
     >> django@ :/code$ python manage.py makemigrations
     ```
@@ -61,11 +63,11 @@ You can change the variable `APPS_DIR` in `config/settings/apps.py` which points
 
 **example**:
 ```bash
-$ docker-compose run web python manage.py startapp core
+$ docker compose -f docker-compose.local.yml run web python manage.py startapp core
 ```
 or ignore `APPS_DIR` and give the directory yourself, which is not recommended at all:
 ```bash
-$ docker-compose run web python manage.py startapp core --appdir /home/django/core/apps/app
+$ docker compose -f docker-compose.local.yml run web python manage.py startapp core --appdir /home/django/core/apps/app
 ```
 
 ### startapi
@@ -74,11 +76,11 @@ Create files and directories needed to develop restful apis in the app directory
 
 **example**:
 ```bash
-$ docker-compose run web python manage.py startapi core #To create files needed for rest api development in the core app directory
+$ docker compose -f docker-compose.local.yml run web python manage.py startapi core #To create files needed for rest api development in the core app directory
 ```
 or you can create the files within every other directory your app lives in:
 ```bash
-$ docker-compose run web python manage.py startapi core --appdir /code/foo/
+$ docker compose -f docker-compose.local.yml run web python manage.py startapi core --appdir /code/foo/
 ```
 
 ### renameproject
@@ -88,5 +90,5 @@ Rename the project in all necessary files.
 
 **example**:
 ```bash
-$ docker-compose run web python manage.py renameproject config codestars # "config" is the current name of project and "codestars" is the new name
+$ docker compose -f docker-compose.local.yml run web python manage.py renameproject config codestars # "config" is the current name of project and "codestars" is the new name
 ```
