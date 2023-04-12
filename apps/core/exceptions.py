@@ -50,3 +50,7 @@ class DataInvalidException(CustomAPIException):
 
 class MaximumLimitException(CustomAPIException):
     ...
+
+
+class ErrorException(CustomAPIException):
+    ...
