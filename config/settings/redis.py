@@ -8,23 +8,24 @@ REDIS_PORT = env.str("REDIS_PORT", "6379")
 
 REDIS_CONNECTION_URI = f"redis://{REDIS_HOST}:{REDIS_PORT}/0"
 
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": REDIS_CONNECTION_URI,
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "IGNORE_EXCEPTIONS": False,
-        },
-        "KEY_FUNCTION": "apps.core.redis.make_key",
-        "KEY_PREFIX": "BISTI",
-        "VERSION": 1,
-    }
-}
+# TODO: the cache backend has some problems should be resolved 
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django_redis.cache.RedisCache",
+#         "LOCATION": REDIS_CONNECTION_URI,
+#         "OPTIONS": {
+#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+#             "IGNORE_EXCEPTIONS": False,
+#         },
+#         "KEY_FUNCTION": "apps.core.redis.make_key",
+#         "KEY_PREFIX": "BISTI",
+#         "VERSION": 1,
+#     }
+# }
 
-if REDIS_PASSWORD:
-    CACHES["default"]["OPTIONS"]["PASSWORD"] = REDIS_PASSWORD
-    REDIS_CONNECTION_URI = (
-        f"redis://{REDIS_USER}:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/0"
-    )
-    CACHES["default"]["LOCATION"] = REDIS_CONNECTION_URI
+# if REDIS_PASSWORD:
+#     CACHES["default"]["OPTIONS"]["PASSWORD"] = REDIS_PASSWORD
+#     REDIS_CONNECTION_URI = (
+#         f"redis://{REDIS_USER}:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/0"
+#     )
+#     CACHES["default"]["LOCATION"] = REDIS_CONNECTION_URI

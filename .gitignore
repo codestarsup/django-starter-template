@@ -147,9 +147,9 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-!.envs/*.env.example
-.envs/*.env
 .envs/*
+.envs/*.env
+!.envs/*.env.example
 
 # Spyder project settings
 .spyderproject
@@ -186,3 +186,7 @@ cython_debug/
 
 # Firebase files
 firebase_key.json
+
+# ignoring postgres_data
+postgres_data/
+
