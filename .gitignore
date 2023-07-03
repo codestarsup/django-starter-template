@@ -186,3 +186,7 @@ cython_debug/
 
 # Firebase files
 firebase_key.json
+
+# ignoring postgres_data
+postgres_data/
+

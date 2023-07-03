@@ -12,6 +12,8 @@ This repository is a boilerplate Django project for quickly getting started. Cre
   - [startapp](#startapp)
   - [startapi](#startapi)
   - [Firebase cloud messaging instruction](#firebase-cloud-messaging)
+- [Notes](#notes)
+   - [Database host & name](#db_and_host_name)
 
 ## Getting Started
 
@@ -32,7 +34,7 @@ This repository is a boilerplate Django project for quickly getting started. Cre
     $ git clone git@github.com:codestarsup/django-starter-template.git
     ```
 
-3. Build the dockerfile (Note: If you don't have docker and docker compose -f docker-compose.local.yml already installed
+3. Build the dockerfile (Note: If you don't have docker and docker compose -f docker-compose.local.yml already installed (** Consider renaming the environment variables' files to .django, .postgres and .redis **)
    flow the instructions of [Docker official docs](https://docs.docker.com/compose/install/) to install them):
 
     ```bash
@@ -153,3 +155,11 @@ Rename the project in all necessary files.
 ```bash
 $ docker compose -f docker-compose.local.yml run web python manage.py renameproject config codestars # "config" is the current name of project and "codestars" is the new name
 ```
+
+
+## Notes
+
+### Database host & name
+
+**Note #1:** If you are going to change database container name from starter_database to another name such as project_x_database. consider to change the .postgres env file accordingly. You should set the host name
+to project_x_database. 

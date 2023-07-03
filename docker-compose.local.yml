@@ -6,21 +6,23 @@ services:
       context: ./
       dockerfile: ./Dockerfile.local
     restart: unless-stopped
-    container_name: bisti_web
-    hostname: bisti_web
+    container_name: starter_web
+    hostname: starter_web
     volumes:
       - .:/code
     env_file:
       - .envs/.django
+      - .envs/.postgres
+      - .envs/.redis
     ports:
       - "8000:8000"
       - "5566:5566"
+    command: python manage.py runserver 0.0.0.0:8000
     depends_on:
       database:
         condition: service_healthy
       redis:
         condition: service_healthy
-    entrypoint: "/code/entrypoint.sh"
     healthcheck:
       test: curl --fail http://localhost:8000/health || exit 1
       interval: 10s
@@ -31,8 +33,8 @@ services:
   database:
     image: postgres:14-alpine
     restart: unless-stopped
-    container_name: bisti_database
-    hostname: bisti_database
+    container_name: starter_database
+    hostname: starter_database
     volumes:
       - ./postgres_data:/var/lib/postgresql/data
     env_file:
@@ -49,8 +51,8 @@ services:
   redis:
     image: redis:7-alpine
     restart: unless-stopped
-    container_name: bisti_redis
-    hostname: bisti_redis
+    container_name: starter_redis
+    hostname: starter_redis
     volumes:
       - ./redis_data:/bitnami/redis/data
     env_file:
