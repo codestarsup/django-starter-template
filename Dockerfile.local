@@ -26,6 +26,8 @@ RUN find /opt/venv -type d -name "test" -name "tests" -delete 2>/dev/null
 
 FROM python:3.10-slim AS build-image
 
+WORKDIR /code/
+
 COPY --from=compile-image /opt/venv /opt/venv
 
 ENV PATH="/opt/venv/bin:$PATH"
@@ -48,16 +50,14 @@ ADD ./.supervisord/celery_flower.conf /etc/supervisor/conf.d/celery_flower.conf
 
 RUN mkdir -p /code/logs/
 
+# Entrypoint
+COPY entrypoint.sh /code/entrypoint.sh
+RUN sed -i 's/\r$//g' /code/entrypoint.sh
+RUN chmod +x /code/entrypoint.sh
+
 # For security and image performance, directories will be hardcoded
 COPY .envs /code/.envs
 COPY apps /code/apps
 COPY config /code/config
 COPY static /code/static
 COPY manage.py /code/manage.py
-
-# Entrypoint
-COPY entrypoint.sh /code/entrypoint.sh
-RUN sed -i 's/\r$//g' /code/entrypoint.sh
-RUN chmod +x /code/entrypoint.sh
-
-WORKDIR /code/
