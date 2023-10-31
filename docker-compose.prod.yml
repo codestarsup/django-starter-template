@@ -17,13 +17,13 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    entrypoint: "/code/entrypoint.sh"
+    entrypoint: "/app/scripts/entrypoint.sh"
     volumes:
-      - ../static:/code/static
-      - ../media:/code/media
-      - ../apps:/code/apps
+      - ../static:/app/static
+      - ../media:/app/media
+      - ../apps:/app/apps
     healthcheck:
-      test: curl --fail http://localhost:8000/health || exit 1
+      test: ["CMD", "/app/scripts/health.sh"]
       interval: 10s
       retries: 8
       start_period: 5s

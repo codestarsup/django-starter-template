@@ -1,23 +1,22 @@
-stages:
-    - qa
+variables:
+  PROJECT_NAME: @PROJECT_NAME@
 
-qa_test_stage:
-  image: python:3.9
-  stage: qa
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: never
+    - if: '$CI_COMMIT_REF_NAME == "develop"'
+      when: always
+      variables:
+        ENVIRONMENT_URL: @APP URL@
+        TARGET_HOST: docker-server-1
+        TARGET_POSTGRES_HOST: db-server-1
+    - when: never
 
-  before_script:
-    # Install dependencies
-    - make pip-dev
-
-  script:
-    # Run linter
-    - make lint-changed-files
-    # Run `black` with `--check` flag
-    - make format-check
-    # Run tests
-    - make test
-
-  only:
-    - merge_requests
-
-  allow_failure: false
+include:
+  - project: 'webcentriq-next/felixin'
+    ref: latest
+    file: '/ci/backend/with-docker.gitlab-ci.yml'
+  - project: 'webcentriq-next/felixin'
+    ref: latest
+    file: '/ci/db/postgres.gitlab-ci.yml'
