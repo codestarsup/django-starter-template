@@ -9,7 +9,7 @@ services:
     container_name: starter_backend
     hostname: starter_backend
     volumes:
-      - .:/code
+      - .:/app
     env_file:
       - .envs/.django
       - .envs/.postgres
