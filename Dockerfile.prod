@@ -1,3 +1,8 @@
+#
+#
+#  Instll State
+#
+#
 FROM python:3.10-slim AS compile-image
 LABEL stage=compiler
 
@@ -24,7 +29,15 @@ RUN find /opt/venv -type f -name "*.pyo" -delete 2>/dev/null
 RUN find /opt/venv -type d -name "test" -name "tests" -delete 2>/dev/null
 
 
+#
+#
+#  Build State
+#
+#
+
 FROM python:3.10-slim AS build-image
+
+WORKDIR /app/
 
 COPY --from=compile-image /opt/venv /opt/venv
 
@@ -45,18 +58,17 @@ ADD ./.supervisord/api.conf /etc/supervisor/conf.d/api.conf
 ADD ./.supervisord/celery_worker.conf /etc/supervisor/conf.d/celery_worker.conf
 ADD ./.supervisord/celery_beat.conf /etc/supervisor/conf.d/celery_beat.conf
 
-RUN mkdir -p /code/logs/
+RUN mkdir -p /app/logs/
+
+
+# Add required scripts
+COPY ./scripts /app/scripts
+RUN sed -i 's/\r$//g' /app/scripts/*
+RUN chmod -R +x /app/scripts/*
 
 # For security and image performance, directories will be hardcoded
-COPY .envs /code/.envs
-COPY apps /code/apps
-COPY config /code/config
-COPY static /code/static
-COPY manage.py /code/manage.py
-
-# Entrypoint
-COPY entrypoint.sh /code/entrypoint.sh
-RUN sed -i 's/\r$//g' /code/entrypoint.sh
-RUN chmod +x /code/entrypoint.sh
-
-WORKDIR /code/
+COPY .envs /app/.envs
+COPY apps /app/apps
+COPY config /app/config
+COPY static /app/static
+COPY manage.py /app/manage.py

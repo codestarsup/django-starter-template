@@ -48,11 +48,11 @@ This repository is a boilerplate Django project for quickly getting started. Cre
 5. To interact with docker and run you bash scripts like `python manage.py makemigrations` you can write the command
    like bellow
     ```bash
-    $ docker compose -f docker-compose.local.yml run web python manage.py <your_command>
+    $ docker compose -f docker-compose.local.yml run backend python manage.py <your_command>
     ```
    Or open a terminal session inside container and run with your django project commands simply
     ```bash
-    $ docker compose -f docker-compose.local.yml run web bash
+    $ docker compose -f docker-compose.local.yml run backend bash
 
     >> django@ :/code$ python manage.py makemigrations
     ```
@@ -73,13 +73,13 @@ directory to change the default one.
 **example**:
 
 ```bash
-$ docker compose -f docker-compose.local.yml run web python manage.py startapp core
+$ docker compose -f docker-compose.local.yml run backend python manage.py startapp core
 ```
 
 or ignore `APPS_DIR` and give the directory yourself, which is not recommended at all:
 
 ```bash
-$ docker compose -f docker-compose.local.yml run web python manage.py startapp core --appdir /home/django/core/apps/app
+$ docker compose -f docker-compose.local.yml run backend python manage.py startapp core --appdir /home/django/core/apps/app
 ```
 
 ### startapi
@@ -90,13 +90,13 @@ Create files and directories needed to develop restful apis in the app directory
 **example**:
 
 ```bash
-$ docker compose -f docker-compose.local.yml run web python manage.py startapi core #To create files needed for rest api development in the core app directory
+$ docker compose -f docker-compose.local.yml run backend python manage.py startapi core #To create files needed for rest api development in the core app directory
 ```
 
 or you can create the files within every other directory your app lives in:
 
 ```bash
-$ docker compose -f docker-compose.local.yml run web python manage.py startapi core --appdir /code/foo/
+$ docker compose -f docker-compose.local.yml run backend python manage.py startapi core --appdir /code/foo/
 ```
 
 ### Firebase cloud messaging
@@ -106,7 +106,7 @@ For setup firebase in your project please run this command and **install** the *
 **example**:
 
 ```bash
-$ docker compose -f docker-compose.local.yml run web python manage.py fcmup
+$ docker compose -f docker-compose.local.yml run backend python manage.py fcmup
 ```
 
 For local development run
@@ -153,7 +153,7 @@ Rename the project in all necessary files.
 **example**:
 
 ```bash
-$ docker compose -f docker-compose.local.yml run web python manage.py renameproject config codestars # "config" is the current name of project and "codestars" is the new name
+$ docker compose -f docker-compose.local.yml run backend python manage.py renameproject config codestars # "config" is the current name of project and "codestars" is the new name
 ```
 
 
@@ -162,4 +162,4 @@ $ docker compose -f docker-compose.local.yml run web python manage.py renameproj
 ### Database host & name
 
 **Note #1:** If you are going to change database container name from starter_database to another name such as project_x_database. consider to change the .postgres env file accordingly. You should set the host name
-to project_x_database. 
+to project_x_database.
